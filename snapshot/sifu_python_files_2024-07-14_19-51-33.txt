@@ -1,0 +1,1803 @@
+Application Structure Overview:
+
+This document contains a snapshot of all Python files in the root directory and specified subdirectories of the application.
+Timestamp: 2024-07-14_19-51-33
+
+Application Structure Overview:
+
+This document contains a snapshot of all Python files in the root directory and specified subdirectories of the application.
+Timestamp: 2024-07-14_19-51-33
+
+----------------------------------------
+
+Requirements and IDE Information:
+IDE: Visual Studio Code
+Python version: 3.x
+Project Requirements: Ensure all Python files in specified directories are processed with line numbers and summary statistics.
+
+----------------------------------------
+
+Project Structure:
+./
+    capture.py
+    app.py
+    app/
+        config.py
+        __init__.py
+        ui/
+            main_view.py
+            search_view.py
+            dashboard_view.py
+            __init__.py
+        core/
+            cosmos_db_manager.py
+            __init__.py
+            embedding_manager.py
+            article_processor.py
+        utils/
+            file_handler.py
+            __init__.py
+            visualization.py
+            utils.py
+    .git/
+        objects/
+            9b/
+            94/
+            be/
+            27/
+            pack/
+            10/
+            2f/
+            info/
+            90/
+            e6/
+            2c/
+            83/
+            13/
+        info/
+        hooks/
+        refs/
+            heads/
+            tags/
+    .idea/
+        inspectionProfiles/
+----------------------------------------
+
+File: capture.py
+Path: /Users/aiml/PycharmProjects/sifu/capture.py
+Size: 4498 bytes
+Modified: 2024-07-12 21:47:06
+
+   1: import os
+   2: import datetime
+   3: 
+   4: EXCLUDED_DIRS = {'venv', '.venv', 'history', '__pycache__', 'snapshot', '.old'}
+   5: 
+   6: 
+   7: def get_file_info(file_path):
+   8:     """Get file information including size and modification time."""
+   9:     stats = os.stat(file_path)
+  10:     return {
+  11:         "size": stats.st_size,
+  12:         "modified": datetime.datetime.fromtimestamp(stats.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+  13:     }
+  14: 
+  15: 
+  16: def process_py_files(file_list, output_file, summary_stats):
+  17:     """Process Python files in the given file list."""
+  18:     for py_file in file_list:
+  19:         if not os.path.isfile(py_file):
+  20:             print(f"File {py_file} does not exist.")
+  21:             continue
+  22: 
+  23:         summary_stats['file_count'] += 1
+  24:         file_info = get_file_info(py_file)
+  25: 
+  26:         output_file.write(f"File: {os.path.basename(py_file)}\n")
+  27:         output_file.write(f"Path: {os.path.abspath(py_file)}\n")
+  28:         output_file.write(f"Size: {file_info['size']} bytes\n")
+  29:         output_file.write(f"Modified: {file_info['modified']}\n\n")
+  30: 
+  31:         with open(py_file, 'r') as file:
+  32:             lines = file.readlines()
+  33:             summary_stats['total_lines'] += len(lines)
+  34:             for i, line in enumerate(lines, start=1):
+  35:                 output_file.write(f"{i:4d}: {line}")
+  36: 
+  37:         output_file.write("\n" + "-" * 40 + "\n\n")
+  38: 
+  39: 
+  40: def generate_map(root_dir):
+  41:     """Generate the project structure map."""
+  42:     project_map = []
+  43:     for dirpath, dirnames, filenames in os.walk(root_dir):
+  44:         dirnames[:] = [d for d in dirnames if d not in EXCLUDED_DIRS]
+  45:         depth = dirpath.replace(root_dir, "").count(os.sep)
+  46:         indent = ' ' * 4 * depth
+  47:         project_map.append(f"{indent}{os.path.basename(dirpath)}/")
+  48:         subindent = ' ' * 4 * (depth + 1)
+  49:         for filename in filenames:
+  50:             if filename.endswith('.py'):
+  51:                 project_map.append(f"{subindent}{filename}")
+  52:     return project_map
+  53: 
+  54: 
+  55: def write_header(output_file, current_date):
+  56:     header = [
+  57:         "Application Structure Overview:\n\n",
+  58:         "This document contains a snapshot of all Python files in the root directory and specified subdirectories of the application.\n",
+  59:         f"Timestamp: {current_date}\n\n"
+  60:     ]
+  61:     output_file.writelines(header)
+  62: 
+  63: 
+  64: def main():
+  65:     current_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+  66:     parent_folder = os.path.basename(os.getcwd())
+  67:     output_dir = "snapshot"
+  68:     os.makedirs(output_dir, exist_ok=True)
+  69:     output_file_path = os.path.join(output_dir, f"{parent_folder}_python_files_{current_date}.txt")
+  70: 
+  71:     summary_stats = {
+  72:         'file_count': 0,
+  73:         'total_lines': 0
+  74:     }
+  75: 
+  76:     with open(output_file_path, 'w', encoding='utf-8') as output_file:
+  77:         write_header(output_file, current_date)
+  78:         output_file.write("Application Structure Overview:\n\n")
+  79:         output_file.write(
+  80:             "This document contains a snapshot of all Python files in the root directory and specified subdirectories of the application.\n")
+  81:         output_file.write(f"Timestamp: {current_date}\n\n")
+  82:         output_file.write("-" * 40 + "\n\n")
+  83: 
+  84:         output_file.write("Requirements and IDE Information:\n")
+  85:         output_file.write("IDE: Visual Studio Code\n")
+  86:         output_file.write("Python version: 3.x\n")
+  87:         output_file.write(
+  88:             "Project Requirements: Ensure all Python files in specified directories are processed with line numbers and summary statistics.\n\n")
+  89:         output_file.write("-" * 40 + "\n\n")
+  90: 
+  91:         output_file.write("Project Structure:\n")
+  92:         project_map = generate_map(".")
+  93:         for line in project_map:
+  94:             output_file.write(line + "\n")
+  95: 
+  96:         output_file.write("-" * 40 + "\n\n")
+  97: 
+  98:         file_paths = [os.path.join(dirpath, filename) for dirpath, dirnames, filenames in os.walk(".")
+  99:                       for filename in filenames if
+ 100:                       filename.endswith('.py') and not any(excluded in dirpath for excluded in EXCLUDED_DIRS)]
+ 101:         process_py_files(file_paths, output_file, summary_stats)
+ 102: 
+ 103:         output_file.write("Summary Statistics:\n")
+ 104:         output_file.write(f"Total number of files processed: {summary_stats['file_count']}\n")
+ 105:         output_file.write(f"Total number of lines of code: {summary_stats['total_lines']}\n")
+ 106: 
+ 107:     print(f"Python files snapshot has been saved to {output_file_path}")
+ 108:     print(f"Total number of files processed: {summary_stats['file_count']}")
+ 109:     print(f"Total number of lines of code: {summary_stats['total_lines']}")
+ 110: 
+ 111: 
+ 112: if __name__ == "__main__":
+ 113:     main()
+
+----------------------------------------
+
+File: app.py
+Path: /Users/aiml/PycharmProjects/sifu/app.py
+Size: 1238 bytes
+Modified: 2024-07-14 19:44:07
+
+   1: """
+   2: app.py
+   3: 
+   4: This is the main Streamlit application for the KB Article and Ticket Processing System.
+   5: It provides a user interface for uploading, processing, searching, and visualizing
+   6: KB articles and tickets.
+   7: 
+   8: Author: Principal Python Engineer
+   9: Date: 2024-07-14
+  10: """
+  11: 
+  12: import streamlit as st
+  13: import asyncio
+  14: from app.config import Config
+  15: from app.core.article_processor import ArticleProcessor
+  16: from app.ui import render_main_view, render_dashboard_view, render_search_view
+  17: 
+  18: # Initialize configuration and ArticleProcessor
+  19: config = Config.from_env()
+  20: article_processor = ArticleProcessor(config)
+  21: 
+  22: # Streamlit page configuration
+  23: st.set_page_config(page_title="KB Article and Ticket Processor", layout="wide")
+  24: 
+  25: # Sidebar for navigation
+  26: st.sidebar.title("Navigation")
+  27: page = st.sidebar.radio("Go to", ["Upload and Process", "Dashboard", "Search"])
+  28: 
+  29: async def main():
+  30:     await article_processor.initialize()
+  31: 
+  32:     if page == "Upload and Process":
+  33:         await render_main_view(article_processor)
+  34:     elif page == "Dashboard":
+  35:         await render_dashboard_view(article_processor)
+  36:     elif page == "Search":
+  37:         await render_search_view(article_processor)
+  38: 
+  39:     await article_processor.close()
+  40: 
+  41: if __name__ == "__main__":
+  42:     asyncio.run(main())
+----------------------------------------
+
+File: config.py
+Path: /Users/aiml/PycharmProjects/sifu/app/config.py
+Size: 1675 bytes
+Modified: 2024-07-14 19:11:25
+
+   1: """
+   2: config.py
+   3: 
+   4: This module defines the configuration settings for the KB Article and Ticket Processing System.
+   5: It uses environment variables for sensitive information and provides default values where appropriate.
+   6: 
+   7: Author: Principal Python Engineer
+   8: Date: 2024-07-14
+   9: """
+  10: 
+  11: import os
+  12: from dataclasses import dataclass
+  13: 
+  14: @dataclass
+  15: class Config:
+  16:     # Cosmos DB settings
+  17:     COSMOS_ENDPOINT: str = os.getenv("COSMOS_ENDPOINT")
+  18:     COSMOS_KEY: str = os.getenv("COSMOS_KEY")
+  19:     COSMOS_DATABASE: str = os.getenv("COSMOS_DATABASE", "KBArticlesDB")
+  20:     COSMOS_CONTAINER: str = os.getenv("COSMOS_CONTAINER", "ArticlesAndTickets")
+  21: 
+  22:     # OpenAI API settings
+  23:     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY")
+  24:     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-large")
+  25: 
+  26:     # Application settings
+  27:     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+  28:     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+  29: 
+  30:     # File upload settings
+  31:     MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", 5 * 1024 * 1024))  # 5 MB default
+  32:     ALLOWED_EXTENSIONS: set = {".csv", ".xlsx"}
+  33: 
+  34:     # Processing settings
+  35:     BATCH_SIZE: int = int(os.getenv("BATCH_SIZE", 100))
+  36: 
+  37:     def __post_init__(self):
+  38:         """Validate the configuration after initialization."""
+  39:         if not self.COSMOS_ENDPOINT or not self.COSMOS_KEY:
+  40:             raise ValueError("Cosmos DB endpoint and key must be provided.")
+  41:         if not self.OPENAI_API_KEY:
+  42:             raise ValueError("OpenAI API key must be provided.")
+  43: 
+  44:     @classmethod
+  45:     def from_env(cls):
+  46:         """Create a Config instance from environment variables."""
+  47:         return cls()
+  48: 
+  49: # Usage
+  50: config = Config.from_env()
+----------------------------------------
+
+File: __init__.py
+Path: /Users/aiml/PycharmProjects/sifu/app/__init__.py
+Size: 0 bytes
+Modified: 2024-07-14 19:45:48
+
+
+----------------------------------------
+
+File: main_view.py
+Path: /Users/aiml/PycharmProjects/sifu/app/ui/main_view.py
+Size: 1253 bytes
+Modified: 2024-07-14 19:42:42
+
+   1: import streamlit as st
+   2: from app.core.article_processor import ArticleProcessor
+   3: from app.utils.file_handler import load_and_process_file
+   4: 
+   5: 
+   6: async def render_main_view(article_processor: ArticleProcessor):
+   7:     st.title("Upload and Process KB Articles or Tickets")
+   8: 
+   9:     file_type = st.radio("Select file type:", ('KB Article', 'Ticket'))
+  10:     uploaded_file = st.file_uploader("Choose a file", type=['csv', 'xlsx'])
+  11: 
+  12:     if uploaded_file is not None:
+  13:         if st.button("Process File"):
+  14:             await process_uploaded_file(uploaded_file, file_type.lower().replace(" ", "_"), article_processor)
+  15: 
+  16: 
+  17: async def process_uploaded_file(uploaded_file, file_type, article_processor):
+  18:     df, error = load_and_process_file(uploaded_file, file_type)
+  19:     if error:
+  20:         st.error(error)
+  21:         return
+  22: 
+  23:     progress_bar = st.progress(0)
+  24:     status_text = st.empty()
+  25: 
+  26:     processed_items = await article_processor.process_dataframe(df, file_type)
+  27: 
+  28:     for i, _ in enumerate(processed_items):
+  29:         progress = (i + 1) / len(processed_items)
+  30:         progress_bar.progress(progress)
+  31:         status_text.text(f"Processing item {i + 1} of {len(processed_items)}")
+  32: 
+  33:     status_text.text("Processing complete!")
+  34:     st.success(f"Processed {len(processed_items)} items.")
+----------------------------------------
+
+File: search_view.py
+Path: /Users/aiml/PycharmProjects/sifu/app/ui/search_view.py
+Size: 985 bytes
+Modified: 2024-07-14 19:41:43
+
+   1: import streamlit as st
+   2: from app.core.article_processor import ArticleProcessor
+   3: 
+   4: 
+   5: async def render_search_view(article_processor: ArticleProcessor):
+   6:     st.title("Search KB Articles and Tickets")
+   7: 
+   8:     query = st.text_input("Enter your search query")
+   9:     item_type = st.radio("Select item type to search:", ('kb_article', 'ticket'))
+  10:     top_k = st.slider("Number of results", 1, 20, 5)
+  11: 
+  12:     if st.button("Search"):
+  13:         await search_items(query, item_type, top_k, article_processor)
+  14: 
+  15: 
+  16: async def search_items(query: str, item_type: str, top_k: int, article_processor: ArticleProcessor):
+  17:     results = await article_processor.search_similar_items(query, item_type, top_k)
+  18:     if results:
+  19:         st.subheader("Search Results")
+  20:         for item in results:
+  21:             st.write(f"ID: {item['id']}")
+  22:             st.write(f"Content: {item['content']}")
+  23:             st.write(f"Similarity: {item['similarity']:.2f}")
+  24:             st.write("---")
+  25:     else:
+  26:         st.info("No results found.")
+----------------------------------------
+
+File: dashboard_view.py
+Path: /Users/aiml/PycharmProjects/sifu/app/ui/dashboard_view.py
+Size: 2453 bytes
+Modified: 2024-07-14 19:42:15
+
+   1: # dashboard_view.py
+   2: import streamlit as st
+   3: from app.core.article_processor import ArticleProcessor
+   4: from app.utils.visualization import create_bar_chart, create_pie_chart, create_time_series, visualize_embeddings
+   5: 
+   6: 
+   7: async def render_dashboard_view(article_processor: ArticleProcessor):
+   8:     st.title("Dashboard")
+   9: 
+  10:     await display_statistics(article_processor)
+  11:     await display_embeddings_visualization(article_processor)
+  12: 
+  13: 
+  14: async def display_statistics(article_processor: ArticleProcessor):
+  15:     stats = await article_processor.get_item_statistics()
+  16: 
+  17:     st.subheader("Overall Statistics")
+  18:     col1, col2 = st.columns(2)
+  19:     col1.metric("Total KB Articles", stats['total_kb_articles'])
+  20:     col2.metric("Total Tickets", stats['total_tickets'])
+  21: 
+  22:     st.subheader("KB Article Categories")
+  23:     fig_categories = create_bar_chart(stats['kb_article_categories'], "KB Article Categories")
+  24:     st.plotly_chart(fig_categories)
+  25: 
+  26:     st.subheader("Ticket Quality Distribution")
+  27:     fig_quality = create_pie_chart(stats['ticket_quality_distribution'], "Ticket Quality Distribution")
+  28:     st.plotly_chart(fig_quality)
+  29: 
+  30:     st.subheader("User Proficiency Distribution")
+  31:     fig_proficiency = create_pie_chart(stats['user_proficiency_distribution'], "User Proficiency Distribution")
+  32:     st.plotly_chart(fig_proficiency)
+  33: 
+  34:     st.subheader("Daily Ticket Count (Last 30 Days)")
+  35:     daily_counts = await article_processor.get_daily_ticket_counts(30)
+  36:     dates = list(daily_counts.keys())
+  37:     counts = list(daily_counts.values())
+  38:     fig_time_series = create_time_series(dates, counts, "Daily Ticket Count")
+  39:     st.plotly_chart(fig_time_series)
+  40: 
+  41: 
+  42: async def display_embeddings_visualization(article_processor: ArticleProcessor):
+  43:     st.subheader("Embedding Visualization")
+  44:     item_type = st.radio("Select item type", ["KB Articles", "Tickets"])
+  45:     plot_type = st.selectbox("Select plot type", ["2D", "3D", "Heatmap"])
+  46: 
+  47:     if st.button("Generate Visualization"):
+  48:         with st.spinner("Fetching and processing data..."):
+  49:             items = await article_processor.cosmos_manager.get_items_by_type(
+  50:                 "kb_article" if item_type == "KB Articles" else "ticket"
+  51:             )
+  52:             embeddings = [item['embedding'] for item in items]
+  53:             labels = [item['title'] if item_type == "KB Articles" else item['tracking_index'] for item in items]
+  54: 
+  55:             fig = visualize_embeddings(embeddings, labels, plot_type.lower())
+  56:             st.plotly_chart(fig)
+
+----------------------------------------
+
+File: __init__.py
+Path: /Users/aiml/PycharmProjects/sifu/app/ui/__init__.py
+Size: 133 bytes
+Modified: 2024-07-14 19:42:52
+
+   1: from .main_view import render_main_view
+   2: from .dashboard_view import render_dashboard_view
+   3: from .search_view import render_search_view
+----------------------------------------
+
+File: cosmos_db_manager.py
+Path: /Users/aiml/PycharmProjects/sifu/app/core/cosmos_db_manager.py
+Size: 7867 bytes
+Modified: 2024-07-14 19:13:35
+
+   1: """
+   2: cosmos_db_manager.py
+   3: 
+   4: This module provides a class for managing operations with Azure Cosmos DB.
+   5: It handles connections, CRUD operations, and query execution for KB articles and tickets.
+   6: 
+   7: Author: Principal Python Engineer
+   8: Date: 2024-07-14
+   9: """
+  10: 
+  11: import logging
+  12: from typing import List, Dict, Any, Optional
+  13: from azure.cosmos import CosmosClient, PartitionKey, exceptions
+  14: from azure.cosmos.aio import CosmosClient as AsyncCosmosClient
+  15: from azure.cosmos.aio import ContainerProxy
+  16: from app.config import Config
+  17: 
+  18: logger = logging.getLogger(__name__)
+  19: 
+  20: 
+  21: class CosmosDBManager:
+  22:     def __init__(self, config: Config):
+  23:         self.config = config
+  24:         self.client = CosmosClient(self.config.COSMOS_ENDPOINT, self.config.COSMOS_KEY)
+  25:         self.database = self.client.get_database_client(self.config.COSMOS_DATABASE)
+  26:         self.container = self.database.get_container_client(self.config.COSMOS_CONTAINER)
+  27:         self.async_client = None
+  28:         self.async_database = None
+  29:         self.async_container = None
+  30: 
+  31:     async def initialize_async(self):
+  32:         """Initialize async client for use in async methods."""
+  33:         self.async_client = AsyncCosmosClient(self.config.COSMOS_ENDPOINT, self.config.COSMOS_KEY)
+  34:         self.async_database = self.async_client.get_database_client(self.config.COSMOS_DATABASE)
+  35:         self.async_container = self.async_database.get_container_client(self.config.COSMOS_CONTAINER)
+  36: 
+  37:     async def close_async(self):
+  38:         """Close the async client."""
+  39:         if self.async_client:
+  40:             await self.async_client.close()
+  41: 
+  42:     async def create_container_if_not_exists(self):
+  43:         """Create the container if it doesn't exist."""
+  44:         try:
+  45:             await self.async_database.create_container(
+  46:                 id=self.config.COSMOS_CONTAINER,
+  47:                 partition_key=PartitionKey(path="/id")
+  48:             )
+  49:             logger.info(f"Container '{self.config.COSMOS_CONTAINER}' created successfully.")
+  50:         except exceptions.CosmosResourceExistsError:
+  51:             logger.info(f"Container '{self.config.COSMOS_CONTAINER}' already exists.")
+  52:         except Exception as e:
+  53:             logger.error(f"Error creating container: {str(e)}")
+  54:             raise
+  55: 
+  56:     async def upsert_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
+  57:         """
+  58:         Upsert an item (KB article or ticket) into the Cosmos DB container.
+  59:         """
+  60:         try:
+  61:             result = await self.async_container.upsert_item(item)
+  62:             logger.info(f"Item with id '{item.get('id')}' upserted successfully.")
+  63:             return result
+  64:         except exceptions.CosmosHttpResponseError as e:
+  65:             logger.error(f"Failed to upsert item: {str(e)}")
+  66:             raise
+  67: 
+  68:     async def get_item(self, item_id: str) -> Optional[Dict[str, Any]]:
+  69:         """
+  70:         Retrieve an item by its ID.
+  71:         """
+  72:         try:
+  73:             item = await self.async_container.read_item(item=item_id, partition_key=item_id)
+  74:             return item
+  75:         except exceptions.CosmosResourceNotFoundError:
+  76:             logger.warning(f"Item with id '{item_id}' not found.")
+  77:             return None
+  78:         except exceptions.CosmosHttpResponseError as e:
+  79:             logger.error(f"Failed to retrieve item: {str(e)}")
+  80:             raise
+  81: 
+  82:     async def delete_item(self, item_id: str) -> None:
+  83:         """
+  84:         Delete an item by its ID.
+  85:         """
+  86:         try:
+  87:             await self.async_container.delete_item(item=item_id, partition_key=item_id)
+  88:             logger.info(f"Item with id '{item_id}' deleted successfully.")
+  89:         except exceptions.CosmosResourceNotFoundError:
+  90:             logger.warning(f"Item with id '{item_id}' not found for deletion.")
+  91:         except exceptions.CosmosHttpResponseError as e:
+  92:             logger.error(f"Failed to delete item: {str(e)}")
+  93:             raise
+  94: 
+  95:     async def query_items(self, query: str, parameters: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
+  96:         """
+  97:         Execute a query against the Cosmos DB container.
+  98:         """
+  99:         try:
+ 100:             results = []
+ 101:             async for item in self.async_container.query_items(
+ 102:                     query=query,
+ 103:                     parameters=parameters,
+ 104:                     enable_cross_partition_query=True
+ 105:             ):
+ 106:                 results.append(item)
+ 107:             return results
+ 108:         except exceptions.CosmosHttpResponseError as e:
+ 109:             logger.error(f"Failed to execute query: {str(e)}")
+ 110:             raise
+ 111: 
+ 112:     async def get_items_by_type(self, item_type: str) -> List[Dict[str, Any]]:
+ 113:         """
+ 114:         Retrieve items by their type (e.g., 'kb_article' or 'ticket').
+ 115:         """
+ 116:         query = "SELECT * FROM c WHERE c.type = @type"
+ 117:         parameters = [{"name": "@type", "value": item_type}]
+ 118:         return await self.query_items(query, parameters)
+ 119: 
+ 120:     async def get_item_count(self) -> int:
+ 121:         """
+ 122:         Get the total count of items in the container.
+ 123:         """
+ 124:         try:
+ 125:             query = "SELECT VALUE COUNT(1) FROM c"
+ 126:             results = await self.query_items(query)
+ 127:             return results[0] if results else 0
+ 128:         except exceptions.CosmosHttpResponseError as e:
+ 129:             logger.error(f"Failed to get item count: {str(e)}")
+ 130:             raise
+ 131: 
+ 132:     async def bulk_upsert(self, items: List[Dict[str, Any]]) -> None:
+ 133:         """
+ 134:         Perform a bulk upsert operation for multiple items.
+ 135:         """
+ 136:         try:
+ 137:             async with self.async_container.client.pipeline_executor(
+ 138:                     retry_policy=self.async_container.client.retry_policy) as executor:
+ 139:                 tasks = [executor(self.async_container.upsert_item, body=item) for item in items]
+ 140:                 await executor.wait_all(tasks)
+ 141:             logger.info(f"Bulk upsert of {len(items)} items completed successfully.")
+ 142:         except exceptions.CosmosHttpResponseError as e:
+ 143:             logger.error(f"Failed to perform bulk upsert: {str(e)}")
+ 144:             raise
+ 145: 
+ 146:     async def search_items(self, search_term: str, item_type: Optional[str] = None) -> List[Dict[str, Any]]:
+ 147:         """
+ 148:         Search for items containing a specific term in their title, description, or content.
+ 149:         Optionally filter by item type.
+ 150:         """
+ 151:         query = """
+ 152:         SELECT * FROM c 
+ 153:         WHERE (CONTAINS(LOWER(c.title), LOWER(@search_term)) 
+ 154:             OR CONTAINS(LOWER(c.description), LOWER(@search_term))
+ 155:             OR CONTAINS(LOWER(c.content), LOWER(@search_term)))
+ 156:         """
+ 157:         parameters = [{"name": "@search_term", "value": search_term.lower()}]
+ 158: 
+ 159:         if item_type:
+ 160:             query += " AND c.type = @item_type"
+ 161:             parameters.append({"name": "@item_type", "value": item_type})
+ 162: 
+ 163:         return await self.query_items(query, parameters)
+ 164: 
+ 165: 
+ 166: # Example usage
+ 167: if __name__ == "__main__":
+ 168:     import asyncio
+ 169:     from app.config import Config
+ 170: 
+ 171: 
+ 172:     async def main():
+ 173:         config = Config.from_env()
+ 174:         cosmos_manager = CosmosDBManager(config)
+ 175:         await cosmos_manager.initialize_async()
+ 176: 
+ 177:         # Example: Create container
+ 178:         await cosmos_manager.create_container_if_not_exists()
+ 179: 
+ 180:         # Example: Upsert an item
+ 181:         sample_item = {
+ 182:             "id": "KB001",
+ 183:             "type": "kb_article",
+ 184:             "title": "Sample KB Article",
+ 185:             "content": "This is a sample KB article content.",
+ 186:             "created_at": "2024-07-14T00:00:00Z"
+ 187:         }
+ 188:         await cosmos_manager.upsert_item(sample_item)
+ 189: 
+ 190:         # Example: Retrieve the item
+ 191:         retrieved_item = await cosmos_manager.get_item("KB001")
+ 192:         print("Retrieved item:", retrieved_item)
+ 193: 
+ 194:         # Example: Search items
+ 195:         search_results = await cosmos_manager.search_items("sample", "kb_article")
+ 196:         print("Search results:", search_results)
+ 197: 
+ 198:         # Clean up
+ 199:         await cosmos_manager.delete_item("KB001")
+ 200:         await cosmos_manager.close_async()
+ 201: 
+ 202: 
+ 203:     asyncio.run(main())
+
+----------------------------------------
+
+File: __init__.py
+Path: /Users/aiml/PycharmProjects/sifu/app/core/__init__.py
+Size: 0 bytes
+Modified: 2024-07-14 19:40:41
+
+
+----------------------------------------
+
+File: embedding_manager.py
+Path: /Users/aiml/PycharmProjects/sifu/app/core/embedding_manager.py
+Size: 7401 bytes
+Modified: 2024-07-14 19:14:37
+
+   1: """
+   2: embedding_manager.py
+   3: 
+   4: This module provides a class for managing text embedding operations using OpenAI's
+   5: text-embedding-3-large model. It handles the generation of embeddings for single
+   6: texts or batches of texts, and includes utility functions for working with embeddings.
+   7: 
+   8: Author: Principal Python Engineer
+   9: Date: 2024-07-14
+  10: """
+  11: 
+  12: import logging
+  13: from typing import List, Dict, Any, Union
+  14: import numpy as np
+  15: from openai import AsyncOpenAI
+  16: from tenacity import retry, stop_after_attempt, wait_random_exponential
+  17: from app.config import Config
+  18: 
+  19: logger = logging.getLogger(__name__)
+  20: 
+  21: class EmbeddingManager:
+  22:     def __init__(self, config: Config):
+  23:         self.config = config
+  24:         self.client = AsyncOpenAI(api_key=self.config.OPENAI_API_KEY)
+  25:         self.model = self.config.EMBEDDING_MODEL
+  26:         self.embedding_dimensions = 3072  # Default for text-embedding-3-large
+  27: 
+  28:     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(5))
+  29:     async def get_embedding(self, text: str) -> List[float]:
+  30:         """
+  31:         Generate an embedding for a single text string.
+  32: 
+  33:         Args:
+  34:         text: The input text to embed.
+  35: 
+  36:         Returns:
+  37:         A list of floats representing the embedding.
+  38:         """
+  39:         text = text.replace("\n", " ")
+  40:         try:
+  41:             response = await self.client.embeddings.create(
+  42:                 input=[text],
+  43:                 model=self.model
+  44:             )
+  45:             embedding = response.data[0].embedding
+  46:             logger.info(f"Generated embedding of length {len(embedding)}")
+  47:             return embedding
+  48:         except Exception as e:
+  49:             logger.error(f"Error generating embedding: {str(e)}")
+  50:             raise
+  51: 
+  52:     async def get_embeddings(self, texts: List[str]) -> List[List[float]]:
+  53:         """
+  54:         Generate embeddings for a list of text strings.
+  55: 
+  56:         Args:
+  57:         texts: A list of input texts to embed.
+  58: 
+  59:         Returns:
+  60:         A list of embeddings, where each embedding is a list of floats.
+  61:         """
+  62:         texts = [text.replace("\n", " ") for text in texts]
+  63:         try:
+  64:             response = await self.client.embeddings.create(
+  65:                 input=texts,
+  66:                 model=self.model
+  67:             )
+  68:             embeddings = [data.embedding for data in response.data]
+  69:             logger.info(f"Generated {len(embeddings)} embeddings of length {len(embeddings[0])}")
+  70:             return embeddings
+  71:         except Exception as e:
+  72:             logger.error(f"Error generating embeddings: {str(e)}")
+  73:             raise
+  74: 
+  75:     async def get_embedding_batch(self, texts: List[str], batch_size: int = 100) -> List[List[float]]:
+  76:         """
+  77:         Generate embeddings for a large list of texts in batches.
+  78: 
+  79:         Args:
+  80:         texts: A list of input texts to embed.
+  81:         batch_size: The number of texts to process in each batch.
+  82: 
+  83:         Returns:
+  84:         A list of embeddings, where each embedding is a list of floats.
+  85:         """
+  86:         all_embeddings = []
+  87:         for i in range(0, len(texts), batch_size):
+  88:             batch = texts[i:i+batch_size]
+  89:             batch_embeddings = await self.get_embeddings(batch)
+  90:             all_embeddings.extend(batch_embeddings)
+  91:             logger.info(f"Processed batch {i//batch_size + 1} of {(len(texts)-1)//batch_size + 1}")
+  92:         return all_embeddings
+  93: 
+  94:     @staticmethod
+  95:     def cosine_similarity(embedding1: List[float], embedding2: List[float]) -> float:
+  96:         """
+  97:         Calculate the cosine similarity between two embeddings.
+  98: 
+  99:         Args:
+ 100:         embedding1: The first embedding vector.
+ 101:         embedding2: The second embedding vector.
+ 102: 
+ 103:         Returns:
+ 104:         The cosine similarity as a float between -1 and 1.
+ 105:         """
+ 106:         vec1 = np.array(embedding1)
+ 107:         vec2 = np.array(embedding2)
+ 108:         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+ 109: 
+ 110:     def find_most_similar(self, query_embedding: List[float],
+ 111:                           embeddings: List[List[float]],
+ 112:                           top_k: int = 5) -> List[int]:
+ 113:         """
+ 114:         Find the indices of the most similar embeddings to a query embedding.
+ 115: 
+ 116:         Args:
+ 117:         query_embedding: The query embedding to compare against.
+ 118:         embeddings: A list of embeddings to search through.
+ 119:         top_k: The number of most similar embeddings to return.
+ 120: 
+ 121:         Returns:
+ 122:         A list of indices of the most similar embeddings.
+ 123:         """
+ 124:         similarities = [self.cosine_similarity(query_embedding, emb) for emb in embeddings]
+ 125:         return sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)[:top_k]
+ 126: 
+ 127:     async def search_similar_texts(self, query: str, texts: List[str], embeddings: List[List[float]], top_k: int = 5) -> List[Dict[str, Union[str, float]]]:
+ 128:         """
+ 129:         Search for texts similar to a query string.
+ 130: 
+ 131:         Args:
+ 132:         query: The query string to search for.
+ 133:         texts: A list of texts corresponding to the embeddings.
+ 134:         embeddings: A list of embeddings corresponding to the texts.
+ 135:         top_k: The number of most similar texts to return.
+ 136: 
+ 137:         Returns:
+ 138:         A list of dictionaries containing the similar texts and their similarity scores.
+ 139:         """
+ 140:         query_embedding = await self.get_embedding(query)
+ 141:         similar_indices = self.find_most_similar(query_embedding, embeddings, top_k)
+ 142:         results = []
+ 143:         for idx in similar_indices:
+ 144:             similarity = self.cosine_similarity(query_embedding, embeddings[idx])
+ 145:             results.append({
+ 146:                 "text": texts[idx],
+ 147:                 "similarity": similarity
+ 148:             })
+ 149:         return results
+ 150: 
+ 151:     def combine_embeddings(self, embeddings: List[List[float]]) -> List[float]:
+ 152:         """
+ 153:         Combine multiple embeddings into a single embedding by averaging.
+ 154: 
+ 155:         Args:
+ 156:         embeddings: A list of embeddings to combine.
+ 157: 
+ 158:         Returns:
+ 159:         A single combined embedding.
+ 160:         """
+ 161:         return list(np.mean(embeddings, axis=0))
+ 162: 
+ 163: # Example usage
+ 164: if __name__ == "__main__":
+ 165:     import asyncio
+ 166:     from app.config import Config
+ 167: 
+ 168:     async def main():
+ 169:         config = Config.from_env()
+ 170:         embedding_manager = EmbeddingManager(config)
+ 171: 
+ 172:         # Example: Generate embedding for a single text
+ 173:         text = "OpenAI's text-embedding-3-large model is powerful for various NLP tasks."
+ 174:         embedding = await embedding_manager.get_embedding(text)
+ 175:         print(f"Single embedding (first 5 dimensions): {embedding[:5]}")
+ 176:         print(f"Embedding length: {len(embedding)}")
+ 177: 
+ 178:         # Example: Generate embeddings for multiple texts
+ 179:         texts = [
+ 180:             "The quick brown fox jumps over the lazy dog.",
+ 181:             "OpenAI's GPT models have revolutionized natural language processing.",
+ 182:             "Python is a versatile programming language used in data science and AI."
+ 183:         ]
+ 184:         embeddings = await embedding_manager.get_embeddings(texts)
+ 185:         print(f"Number of embeddings: {len(embeddings)}")
+ 186:         print(f"Each embedding length: {len(embeddings[0])}")
+ 187: 
+ 188:         # Example: Search similar texts
+ 189:         query = "Artificial Intelligence and its applications in modern technology"
+ 190:         similar_texts = await embedding_manager.search_similar_texts(query, texts, embeddings)
+ 191:         for result in similar_texts:
+ 192:             print(f"Similar text: {result['text']}")
+ 193:             print(f"Similarity score: {result['similarity']:.4f}")
+ 194: 
+ 195:     asyncio.run(main())
+
+----------------------------------------
+
+File: article_processor.py
+Path: /Users/aiml/PycharmProjects/sifu/app/core/article_processor.py
+Size: 11701 bytes
+Modified: 2024-07-14 19:15:05
+
+   1: """
+   2: article_processor.py
+   3: 
+   4: This module provides a class for processing KB articles and ticket data.
+   5: It integrates the CosmosDBManager and EmbeddingManager to handle storage
+   6: and embedding generation for articles and tickets.
+   7: 
+   8: Author: Principal Python Engineer
+   9: Date: 2024-07-14
+  10: """
+  11: 
+  12: import logging
+  13: from typing import List, Dict, Any, Optional
+  14: import pandas as pd
+  15: from datetime import datetime
+  16: from app.config import Config
+  17: from app.core.cosmos_db_manager import CosmosDBManager
+  18: from app.core.embedding_manager import EmbeddingManager
+  19: 
+  20: logger = logging.getLogger(__name__)
+  21: 
+  22: 
+  23: class ArticleProcessor:
+  24:     def __init__(self, config: Config):
+  25:         self.config = config
+  26:         self.cosmos_manager = CosmosDBManager(config)
+  27:         self.embedding_manager = EmbeddingManager(config)
+  28: 
+  29:     async def initialize(self):
+  30:         """Initialize async clients for CosmosDBManager and EmbeddingManager."""
+  31:         await self.cosmos_manager.initialize_async()
+  32: 
+  33:     async def close(self):
+  34:         """Close async clients."""
+  35:         await self.cosmos_manager.close_async()
+  36: 
+  37:     async def process_kb_article(self, article: Dict[str, Any]) -> Dict[str, Any]:
+  38:         """
+  39:         Process a single KB article, ensuring uniqueness and proper versioning.
+  40: 
+  41:         Args:
+  42:         article: Dictionary containing KB article data
+  43: 
+  44:         Returns:
+  45:         Processed article with generated embedding
+  46:         """
+  47:         try:
+  48:             # Check if the article already exists
+  49:             existing_article = await self.cosmos_manager.get_item(article["KB Article #"])
+  50:             if existing_article:
+  51:                 # Update the existing article with new information
+  52:                 for key, value in article.items():
+  53:                     existing_article[key] = value
+  54:                 article = existing_article
+  55:                 article["Version"] = str(float(article["Version"]) + 0.1)  # Increment version
+  56:                 logger.info(f"Updating existing KB article {article['KB Article #']} to version {article['Version']}")
+  57:             else:
+  58:                 logger.info(f"Creating new KB article {article['KB Article #']}")
+  59: 
+  60:             # Generate embedding for the article content
+  61:             content = f"{article['Title']} {article['Introduction']} {article['Instructions']}"
+  62:             embedding = await self.embedding_manager.get_embedding(content)
+  63: 
+  64:             # Prepare article for storage
+  65:             processed_article = {
+  66:                 "id": article["KB Article #"],
+  67:                 "type": "kb_article",
+  68:                 "version": article["Version"],
+  69:                 "category": article["Category"],
+  70:                 "title": article["Title"],
+  71:                 "introduction": article["Introduction"],
+  72:                 "instructions": article["Instructions"],
+  73:                 "keywords": article["Keywords"],
+  74:                 "updated": datetime.now().isoformat(),
+  75:                 "embedding": embedding
+  76:             }
+  77: 
+  78:             # Store the article in Cosmos DB
+  79:             await self.cosmos_manager.upsert_item(processed_article)
+  80:             logger.info(f"Processed and stored KB article: {processed_article['id']}")
+  81: 
+  82:             return processed_article
+  83:         except Exception as e:
+  84:             logger.error(f"Error processing KB article: {str(e)}")
+  85:             raise
+  86: 
+  87:     async def process_ticket(self, ticket: Dict[str, Any]) -> Dict[str, Any]:
+  88:         """
+  89:         Process a single ticket.
+  90: 
+  91:         Args:
+  92:         ticket: Dictionary containing ticket data
+  93: 
+  94:         Returns:
+  95:         Processed ticket with generated embedding
+  96:         """
+  97:         try:
+  98:             # Generate embedding for the ticket content
+  99:             content = f"{ticket['Description']} {ticket['Close Notes']} {ticket['summarize_ticket']}"
+ 100:             embedding = await self.embedding_manager.get_embedding(content)
+ 101: 
+ 102:             # Prepare ticket for storage
+ 103:             processed_ticket = {
+ 104:                 "id": f"{ticket['tracking_index']}_{datetime.now().isoformat()}",  # Ensure uniqueness
+ 105:                 "type": "ticket",
+ 106:                 "tracking_index": ticket["tracking_index"],
+ 107:                 "description": ticket["Description"],
+ 108:                 "close_notes": ticket["Close Notes"],
+ 109:                 "summary": ticket["summarize_ticket"],
+ 110:                 "ticket_quality": ticket["ticket_quality"],
+ 111:                 "user_proficiency": ticket["user_proficiency_level"],
+ 112:                 "potential_impact": ticket["potential_impact"],
+ 113:                 "resolution_appropriateness": ticket["resolution_appropriateness"],
+ 114:                 "potential_root_cause": ticket["potential_root_cause"],
+ 115:                 "embedding": embedding,
+ 116:                 "created_at": datetime.now().isoformat()
+ 117:             }
+ 118: 
+ 119:             # Add optional fields if they exist
+ 120:             optional_fields = [
+ 121:                 "summarize_ticket_explanation", "ticket_quality_explanation",
+ 122:                 "user_proficiency_level_explanation", "potential_impact_explanation",
+ 123:                 "resolution_appropriateness_explanation", "potential_root_cause_explanation"
+ 124:             ]
+ 125:             for field in optional_fields:
+ 126:                 if field in ticket:
+ 127:                     processed_ticket[field] = ticket[field]
+ 128: 
+ 129:             # Store the ticket in Cosmos DB
+ 130:             await self.cosmos_manager.upsert_item(processed_ticket)
+ 131:             logger.info(f"Processed and stored ticket: {processed_ticket['id']}")
+ 132: 
+ 133:             return processed_ticket
+ 134:         except Exception as e:
+ 135:             logger.error(f"Error processing ticket: {str(e)}")
+ 136:             raise
+ 137: 
+ 138:     async def process_dataframe(self, df: pd.DataFrame, item_type: str) -> List[Dict[str, Any]]:
+ 139:         """
+ 140:         Process a dataframe of KB articles or tickets.
+ 141: 
+ 142:         Args:
+ 143:         df: DataFrame containing KB articles or tickets
+ 144:         item_type: Either 'kb_article' or 'ticket'
+ 145: 
+ 146:         Returns:
+ 147:         List of processed items
+ 148:         """
+ 149:         processed_items = []
+ 150:         for _, row in df.iterrows():
+ 151:             item = row.to_dict()
+ 152:             if item_type == 'kb_article':
+ 153:                 processed_item = await self.process_kb_article(item)
+ 154:             elif item_type == 'ticket':
+ 155:                 processed_item = await self.process_ticket(item)
+ 156:             else:
+ 157:                 raise ValueError(f"Invalid item type: {item_type}")
+ 158:             processed_items.append(processed_item)
+ 159: 
+ 160:         logger.info(f"Processed {len(processed_items)} items of type {item_type}")
+ 161:         return processed_items
+ 162: 
+ 163:     async def search_similar_items(self, query: str, item_type: str, top_k: int = 5) -> List[Dict[str, Any]]:
+ 164:         """
+ 165:         Search for items similar to the query.
+ 166: 
+ 167:         Args:
+ 168:         query: The search query
+ 169:         item_type: Either 'kb_article' or 'ticket'
+ 170:         top_k: Number of top results to return
+ 171: 
+ 172:         Returns:
+ 173:         List of similar items
+ 174:         """
+ 175:         try:
+ 176:             # Generate embedding for the query
+ 177:             query_embedding = await self.embedding_manager.get_embedding(query)
+ 178: 
+ 179:             # Retrieve all items of the specified type
+ 180:             items = await self.cosmos_manager.get_items_by_type(item_type)
+ 181: 
+ 182:             # Extract embeddings and texts
+ 183:             embeddings = [item['embedding'] for item in items]
+ 184:             texts = [item['title'] if item_type == 'kb_article' else item['description'] for item in items]
+ 185: 
+ 186:             # Find most similar items
+ 187:             similar_indices = self.embedding_manager.find_most_similar(query_embedding, embeddings, top_k)
+ 188: 
+ 189:             # Prepare results
+ 190:             results = []
+ 191:             for idx in similar_indices:
+ 192:                 item = items[idx]
+ 193:                 similarity = self.embedding_manager.cosine_similarity(query_embedding, item['embedding'])
+ 194:                 results.append({
+ 195:                     "id": item['id'],
+ 196:                     "type": item_type,
+ 197:                     "content": item['title'] if item_type == 'kb_article' else item['description'],
+ 198:                     "similarity": similarity
+ 199:                 })
+ 200: 
+ 201:             return results
+ 202:         except Exception as e:
+ 203:             logger.error(f"Error searching similar items: {str(e)}")
+ 204:             raise
+ 205: 
+ 206:     async def get_item_statistics(self) -> Dict[str, Any]:
+ 207:         """
+ 208:         Get statistics about the items in the database.
+ 209: 
+ 210:         Returns:
+ 211:         Dictionary containing various statistics
+ 212:         """
+ 213:         try:
+ 214:             kb_articles = await self.cosmos_manager.get_items_by_type('kb_article')
+ 215:             tickets = await self.cosmos_manager.get_items_by_type('ticket')
+ 216: 
+ 217:             stats = {
+ 218:                 "total_kb_articles": len(kb_articles),
+ 219:                 "total_tickets": len(tickets),
+ 220:                 "kb_article_categories": {},
+ 221:                 "ticket_quality_distribution": {},
+ 222:                 "user_proficiency_distribution": {}
+ 223:             }
+ 224: 
+ 225:             for article in kb_articles:
+ 226:                 category = article.get('category', 'Unknown')
+ 227:                 stats["kb_article_categories"][category] = stats["kb_article_categories"].get(category, 0) + 1
+ 228: 
+ 229:             for ticket in tickets:
+ 230:                 quality = ticket.get('ticket_quality', 'Unknown')
+ 231:                 proficiency = ticket.get('user_proficiency', 'Unknown')
+ 232:                 stats["ticket_quality_distribution"][quality] = stats["ticket_quality_distribution"].get(quality, 0) + 1
+ 233:                 stats["user_proficiency_distribution"][proficiency] = stats["user_proficiency_distribution"].get(
+ 234:                     proficiency, 0) + 1
+ 235: 
+ 236:             return stats
+ 237:         except Exception as e:
+ 238:             logger.error(f"Error getting item statistics: {str(e)}")
+ 239:             raise
+ 240: 
+ 241: 
+ 242: # Example usage
+ 243: if __name__ == "__main__":
+ 244:     import asyncio
+ 245:     from app.config import Config
+ 246: 
+ 247: 
+ 248:     async def main():
+ 249:         config = Config.from_env()
+ 250:         processor = ArticleProcessor(config)
+ 251:         await processor.initialize()
+ 252: 
+ 253:         # Example: Process a KB article
+ 254:         kb_article = {
+ 255:             "KB Article #": "KB001",
+ 256:             "Version": "1.0",
+ 257:             "Category": "Troubleshooting",
+ 258:             "Title": "How to reset your password",
+ 259:             "Introduction": "This article explains the process of resetting your password.",
+ 260:             "Instructions": "1. Go to the login page. 2. Click on 'Forgot Password'. 3. Follow the prompts.",
+ 261:             "Keywords": "password, reset, login"
+ 262:         }
+ 263:         processed_article = await processor.process_kb_article(kb_article)
+ 264:         print("Processed KB Article:", processed_article['id'])
+ 265: 
+ 266:         # Example: Process a ticket
+ 267:         ticket = {
+ 268:             "tracking_index": "T001",
+ 269:             "Description": "User unable to log in to the system",
+ 270:             "Close Notes": "Guided user through password reset process",
+ 271:             "summarize_ticket": "Password reset assistance provided",
+ 272:             "ticket_quality": "Good",
+ 273:             "user_proficiency_level": "Beginner",
+ 274:             "potential_impact": "Low",
+ 275:             "resolution_appropriateness": "Appropriate",
+ 276:             "potential_root_cause": "Forgotten password"
+ 277:         }
+ 278:         processed_ticket = await processor.process_ticket(ticket)
+ 279:         print("Processed Ticket:", processed_ticket['id'])
+ 280: 
+ 281:         # Example: Search similar items
+ 282:         similar_items = await processor.search_similar_items("password reset", "kb_article", top_k=3)
+ 283:         print("Similar KB Articles:")
+ 284:         for item in similar_items:
+ 285:             print(f"- {item['content']} (Similarity: {item['similarity']:.2f})")
+ 286: 
+ 287:         # Example: Get item statistics
+ 288:         stats = await processor.get_item_statistics()
+ 289:         print("Item Statistics:")
+ 290:         print(f"Total KB Articles: {stats['total_kb_articles']}")
+ 291:         print(f"Total Tickets: {stats['total_tickets']}")
+ 292: 
+ 293:         await processor.close()
+ 294: 
+ 295: 
+ 296:     asyncio.run(main())
+----------------------------------------
+
+File: file_handler.py
+Path: /Users/aiml/PycharmProjects/sifu/app/utils/file_handler.py
+Size: 6556 bytes
+Modified: 2024-07-14 19:24:39
+
+   1: """
+   2: file_handler.py
+   3: 
+   4: This module provides utilities for handling file uploads and processing
+   5: both KB articles and Ticket Data.
+   6: 
+   7: Author: Principal Python Engineer
+   8: Date: 2024-07-14
+   9: """
+  10: 
+  11: import pandas as pd
+  12: import io
+  13: from typing import Tuple, Optional, Dict, Any
+  14: import logging
+  15: from app.config import Config
+  16: 
+  17: logger = logging.getLogger(__name__)
+  18: 
+  19: 
+  20: def load_and_process_file(file, file_type: str) -> Tuple[Optional[pd.DataFrame], str]:
+  21:     """
+  22:     Load and process an uploaded file.
+  23: 
+  24:     Args:
+  25:     file: The uploaded file object
+  26:     file_type: Either 'kb_article' or 'ticket'
+  27: 
+  28:     Returns:
+  29:     Tuple of (DataFrame or None, error message or empty string)
+  30:     """
+  31:     try:
+  32:         if file.name.endswith('.xlsx'):
+  33:             df = pd.read_excel(io.BytesIO(file.read()))
+  34:         elif file.name.endswith('.csv'):
+  35:             df = pd.read_csv(io.BytesIO(file.read()))
+  36:         else:
+  37:             return None, f"Unsupported file type: {file.name}. Please upload .xlsx or .csv files."
+  38: 
+  39:         if file_type == 'kb_article':
+  40:             return process_kb_article(df)
+  41:         elif file_type == 'ticket':
+  42:             return process_ticket(df)
+  43:         else:
+  44:             return None, f"Invalid file type specified: {file_type}"
+  45: 
+  46:     except Exception as e:
+  47:         logger.error(f"Error processing file {file.name}: {str(e)}")
+  48:         return None, f"Error processing file: {str(e)}"
+  49: 
+  50: 
+  51: def process_kb_article(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], str]:
+  52:     """
+  53:     Process and validate KB article data.
+  54: 
+  55:     Args:
+  56:     df: DataFrame containing KB article data
+  57: 
+  58:     Returns:
+  59:     Tuple of (Processed DataFrame or None, error message or empty string)
+  60:     """
+  61:     required_columns = ['KB Article #', 'Version', 'Category', 'Title', 'Introduction', 'Instructions', 'Keywords']
+  62: 
+  63:     if not all(col in df.columns for col in required_columns):
+  64:         missing_columns = [col for col in required_columns if col not in df.columns]
+  65:         return None, f"Missing required columns for KB article: {', '.join(missing_columns)}"
+  66: 
+  67:     # Additional processing steps
+  68:     df['Updated'] = pd.Timestamp.now().isoformat()
+  69:     df['KB Article #'] = df['KB Article #'].astype(str)
+  70:     df['Version'] = df['Version'].astype(str)
+  71: 
+  72:     # Validate data types
+  73:     if not df['KB Article #'].str.match(r'KB\d+').all():
+  74:         return None, "Invalid 'KB Article #' format. Should be 'KB' followed by numbers."
+  75: 
+  76:     if not df['Version'].str.match(r'\d+\.\d+').all():
+  77:         return None, "Invalid 'Version' format. Should be in X.Y format (e.g., 1.0)."
+  78: 
+  79:     return df, ""
+  80: 
+  81: 
+  82: def process_ticket(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], str]:
+  83:     """
+  84:     Process and validate Ticket Data.
+  85: 
+  86:     Args:
+  87:     df: DataFrame containing Ticket Data
+  88: 
+  89:     Returns:
+  90:     Tuple of (Processed DataFrame or None, error message or empty string)
+  91:     """
+  92:     required_columns = [
+  93:         'tracking_index', 'Description', 'Close Notes', 'summarize_ticket',
+  94:         'ticket_quality', 'user_proficiency_level', 'potential_impact',
+  95:         'resolution_appropriateness', 'potential_root_cause'
+  96:     ]
+  97: 
+  98:     if not all(col in df.columns for col in required_columns):
+  99:         missing_columns = [col for col in required_columns if col not in df.columns]
+ 100:         return None, f"Missing required columns for Ticket Data: {', '.join(missing_columns)}"
+ 101: 
+ 102:     # Handle potential missing columns that are not required
+ 103:     optional_columns = [
+ 104:         'summarize_ticket_explanation', 'ticket_quality_explanation',
+ 105:         'user_proficiency_level_explanation', 'potential_impact_explanation',
+ 106:         'resolution_appropriateness_explanation', 'potential_root_cause_explanation'
+ 107:     ]
+ 108: 
+ 109:     for col in optional_columns:
+ 110:         if col not in df.columns:
+ 111:             df[col] = ''  # Add empty column if missing
+ 112: 
+ 113:     # Additional processing steps
+ 114:     df['created_at'] = pd.Timestamp.now().isoformat()
+ 115:     df['tracking_index'] = df['tracking_index'].astype(str)
+ 116: 
+ 117:     # Validate data types and formats
+ 118:     if not df['tracking_index'].str.match(r'T\d+').all():
+ 119:         return None, "Invalid 'tracking_index' format. Should be 'T' followed by numbers."
+ 120: 
+ 121:     valid_qualities = ['Poor', 'Fair', 'Good', 'Excellent']
+ 122:     if not df['ticket_quality'].isin(valid_qualities).all():
+ 123:         return None, f"Invalid 'ticket_quality'. Should be one of: {', '.join(valid_qualities)}"
+ 124: 
+ 125:     valid_proficiencies = ['Beginner', 'Intermediate', 'Advanced', 'Expert']
+ 126:     if not df['user_proficiency_level'].isin(valid_proficiencies).all():
+ 127:         return None, f"Invalid 'user_proficiency_level'. Should be one of: {', '.join(valid_proficiencies)}"
+ 128: 
+ 129:     valid_impacts = ['Low', 'Medium', 'High', 'Critical']
+ 130:     if not df['potential_impact'].isin(valid_impacts).all():
+ 131:         return None, f"Invalid 'potential_impact'. Should be one of: {', '.join(valid_impacts)}"
+ 132: 
+ 133:     return df, ""
+ 134: 
+ 135: 
+ 136: def validate_file_size(file, max_size: int) -> Tuple[bool, str]:
+ 137:     """
+ 138:     Validate the size of the uploaded file.
+ 139: 
+ 140:     Args:
+ 141:     file: The uploaded file object
+ 142:     max_size: Maximum allowed file size in bytes
+ 143: 
+ 144:     Returns:
+ 145:     Tuple of (is_valid: bool, error_message: str)
+ 146:     """
+ 147:     if file.size > max_size:
+ 148:         return False, f"File size exceeds the maximum limit of {max_size / (1024 * 1024):.2f} MB"
+ 149:     return True, ""
+ 150: 
+ 151: 
+ 152: def get_file_info(file) -> Dict[str, Any]:
+ 153:     """
+ 154:     Get information about the uploaded file.
+ 155: 
+ 156:     Args:
+ 157:     file: The uploaded file object
+ 158: 
+ 159:     Returns:
+ 160:     Dictionary containing file information
+ 161:     """
+ 162:     return {
+ 163:         "name": file.name,
+ 164:         "type": file.type,
+ 165:         "size": file.size,
+ 166:         "last_modified": pd.Timestamp(file.last_modified).isoformat() if hasattr(file, 'last_modified') else None
+ 167:     }
+ 168: 
+ 169: 
+ 170: # Example usage
+ 171: if __name__ == "__main__":
+ 172:     import streamlit as st
+ 173: 
+ 174:     st.title("File Upload and Processing Demo")
+ 175: 
+ 176:     uploaded_file = st.file_uploader("Choose a file", type=['csv', 'xlsx'])
+ 177: 
+ 178:     if uploaded_file is not None:
+ 179:         file_info = get_file_info(uploaded_file)
+ 180:         st.write("File Information:", file_info)
+ 181: 
+ 182:         is_valid_size, size_error = validate_file_size(uploaded_file, Config.MAX_UPLOAD_SIZE)
+ 183:         if not is_valid_size:
+ 184:             st.error(size_error)
+ 185:         else:
+ 186:             file_type = st.radio("Select file type:", ('KB Article', 'Ticket'))
+ 187:             if st.button("Process File"):
+ 188:                 df, error = load_and_process_file(uploaded_file, file_type.lower().replace(" ", "_"))
+ 189:                 if error:
+ 190:                     st.error(error)
+ 191:                 else:
+ 192:                     st.success("File processed successfully!")
+ 193:                     st.write(df.head())
+
+----------------------------------------
+
+File: __init__.py
+Path: /Users/aiml/PycharmProjects/sifu/app/utils/__init__.py
+Size: 0 bytes
+Modified: 2024-07-14 19:40:41
+
+
+----------------------------------------
+
+File: visualization.py
+Path: /Users/aiml/PycharmProjects/sifu/app/utils/visualization.py
+Size: 6646 bytes
+Modified: 2024-07-14 19:20:35
+
+   1: """
+   2: visualization.py
+   3: 
+   4: This module provides utility functions for creating various visualizations
+   5: of KB articles, tickets, and their embeddings. It uses Plotly for interactive
+   6: charts and supports integration with Streamlit.
+   7: 
+   8: Author: Principal Python Engineer
+   9: Date: 2024-07-14
+  10: """
+  11: 
+  12: import plotly.graph_objects as go
+  13: import plotly.express as px
+  14: from sklearn.manifold import TSNE
+  15: from typing import List, Dict, Any
+  16: import pandas as pd
+  17: import numpy as np
+  18: import logging
+  19: 
+  20: logger = logging.getLogger(__name__)
+  21: 
+  22: 
+  23: def reduce_dimensions(embeddings: List[List[float]], n_components: int = 2) -> np.ndarray:
+  24:     """
+  25:     Reduce the dimensionality of embeddings using t-SNE.
+  26: 
+  27:     Args:
+  28:     embeddings: List of embedding vectors
+  29:     n_components: Number of dimensions to reduce to (default is 2 for 2D visualization)
+  30: 
+  31:     Returns:
+  32:     Numpy array of reduced embeddings
+  33:     """
+  34:     try:
+  35:         tsne = TSNE(n_components=n_components, random_state=42)
+  36:         return tsne.fit_transform(embeddings)
+  37:     except Exception as e:
+  38:         logger.error(f"Error in dimension reduction: {str(e)}")
+  39:         raise
+  40: 
+  41: 
+  42: def create_scatter_plot(reduced_embeddings: np.ndarray, labels: List[str], title: str) -> go.Figure:
+  43:     """
+  44:     Create a scatter plot of reduced embeddings.
+  45: 
+  46:     Args:
+  47:     reduced_embeddings: Numpy array of reduced embeddings
+  48:     labels: List of labels for each point
+  49:     title: Title of the plot
+  50: 
+  51:     Returns:
+  52:     Plotly Figure object
+  53:     """
+  54:     df = pd.DataFrame({
+  55:         'x': reduced_embeddings[:, 0],
+  56:         'y': reduced_embeddings[:, 1],
+  57:         'label': labels
+  58:     })
+  59: 
+  60:     fig = px.scatter(df, x='x', y='y', hover_data=['label'], title=title)
+  61:     fig.update_traces(marker=dict(size=10))
+  62:     return fig
+  63: 
+  64: 
+  65: def create_3d_scatter_plot(reduced_embeddings: np.ndarray, labels: List[str], title: str) -> go.Figure:
+  66:     """
+  67:     Create a 3D scatter plot of reduced embeddings.
+  68: 
+  69:     Args:
+  70:     reduced_embeddings: Numpy array of reduced embeddings (should be 3D)
+  71:     labels: List of labels for each point
+  72:     title: Title of the plot
+  73: 
+  74:     Returns:
+  75:     Plotly Figure object
+  76:     """
+  77:     if reduced_embeddings.shape[1] != 3:
+  78:         raise ValueError("Embeddings must be 3D for 3D scatter plot")
+  79: 
+  80:     df = pd.DataFrame({
+  81:         'x': reduced_embeddings[:, 0],
+  82:         'y': reduced_embeddings[:, 1],
+  83:         'z': reduced_embeddings[:, 2],
+  84:         'label': labels
+  85:     })
+  86: 
+  87:     fig = px.scatter_3d(df, x='x', y='y', z='z', hover_data=['label'], title=title)
+  88:     fig.update_traces(marker=dict(size=5))
+  89:     return fig
+  90: 
+  91: 
+  92: def create_heatmap(similarity_matrix: np.ndarray, labels: List[str], title: str) -> go.Figure:
+  93:     """
+  94:     Create a heatmap of similarity between embeddings.
+  95: 
+  96:     Args:
+  97:     similarity_matrix: 2D numpy array of similarities
+  98:     labels: List of labels for each row/column
+  99:     title: Title of the plot
+ 100: 
+ 101:     Returns:
+ 102:     Plotly Figure object
+ 103:     """
+ 104:     fig = go.Figure(data=go.Heatmap(z=similarity_matrix, x=labels, y=labels))
+ 105:     fig.update_layout(title=title, xaxis_title="Items", yaxis_title="Items")
+ 106:     return fig
+ 107: 
+ 108: 
+ 109: def visualize_embeddings(embeddings: List[List[float]], labels: List[str], plot_type: str = '2d') -> go.Figure:
+ 110:     """
+ 111:     Visualize embeddings based on the specified plot type.
+ 112: 
+ 113:     Args:
+ 114:     embeddings: List of embedding vectors
+ 115:     labels: List of labels for each embedding
+ 116:     plot_type: Type of plot ('2d', '3d', or 'heatmap')
+ 117: 
+ 118:     Returns:
+ 119:     Plotly Figure object
+ 120:     """
+ 121:     try:
+ 122:         if plot_type == '2d':
+ 123:             reduced = reduce_dimensions(embeddings, n_components=2)
+ 124:             return create_scatter_plot(reduced, labels, "2D Visualization of Embeddings")
+ 125:         elif plot_type == '3d':
+ 126:             reduced = reduce_dimensions(embeddings, n_components=3)
+ 127:             return create_3d_scatter_plot(reduced, labels, "3D Visualization of Embeddings")
+ 128:         elif plot_type == 'heatmap':
+ 129:             similarity_matrix = np.inner(embeddings, embeddings)
+ 130:             return create_heatmap(similarity_matrix, labels, "Similarity Heatmap of Embeddings")
+ 131:         else:
+ 132:             raise ValueError(f"Unsupported plot type: {plot_type}")
+ 133:     except Exception as e:
+ 134:         logger.error(f"Error in visualizing embeddings: {str(e)}")
+ 135:         raise
+ 136: 
+ 137: 
+ 138: def create_bar_chart(data: Dict[str, int], title: str) -> go.Figure:
+ 139:     """
+ 140:     Create a bar chart for categorical data.
+ 141: 
+ 142:     Args:
+ 143:     data: Dictionary of category-count pairs
+ 144:     title: Title of the chart
+ 145: 
+ 146:     Returns:
+ 147:     Plotly Figure object
+ 148:     """
+ 149:     fig = go.Figure([go.Bar(x=list(data.keys()), y=list(data.values()))])
+ 150:     fig.update_layout(title=title, xaxis_title="Category", yaxis_title="Count")
+ 151:     return fig
+ 152: 
+ 153: 
+ 154: def create_pie_chart(data: Dict[str, int], title: str) -> go.Figure:
+ 155:     """
+ 156:     Create a pie chart for categorical data.
+ 157: 
+ 158:     Args:
+ 159:     data: Dictionary of category-count pairs
+ 160:     title: Title of the chart
+ 161: 
+ 162:     Returns:
+ 163:     Plotly Figure object
+ 164:     """
+ 165:     fig = go.Figure(data=[go.Pie(labels=list(data.keys()), values=list(data.values()))])
+ 166:     fig.update_layout(title=title)
+ 167:     return fig
+ 168: 
+ 169: 
+ 170: def create_time_series(dates: List[str], values: List[float], title: str) -> go.Figure:
+ 171:     """
+ 172:     Create a time series line plot.
+ 173: 
+ 174:     Args:
+ 175:     dates: List of date strings
+ 176:     values: List of corresponding values
+ 177:     title: Title of the chart
+ 178: 
+ 179:     Returns:
+ 180:     Plotly Figure object
+ 181:     """
+ 182:     fig = go.Figure([go.Scatter(x=dates, y=values, mode='lines+markers')])
+ 183:     fig.update_layout(title=title, xaxis_title="Date", yaxis_title="Value")
+ 184:     return fig
+ 185: 
+ 186: 
+ 187: # Example usage
+ 188: if __name__ == "__main__":
+ 189:     import streamlit as st
+ 190: 
+ 191:     # Sample data
+ 192:     sample_embeddings = np.random.rand(100, 1024)
+ 193:     sample_labels = [f"Item {i}" for i in range(100)]
+ 194: 
+ 195:     st.title("Embedding Visualizations")
+ 196: 
+ 197:     plot_type = st.selectbox("Select plot type", ['2d', '3d', 'heatmap'])
+ 198:     fig = visualize_embeddings(sample_embeddings, sample_labels, plot_type)
+ 199:     st.plotly_chart(fig)
+ 200: 
+ 201:     st.title("Categorical Data Visualizations")
+ 202: 
+ 203:     sample_categories = {
+ 204:         "Technical": 30,
+ 205:         "Customer Service": 25,
+ 206:         "Product": 20,
+ 207:         "Billing": 15,
+ 208:         "Other": 10
+ 209:     }
+ 210: 
+ 211:     bar_fig = create_bar_chart(sample_categories, "Article Categories")
+ 212:     st.plotly_chart(bar_fig)
+ 213: 
+ 214:     pie_fig = create_pie_chart(sample_categories, "Article Category Distribution")
+ 215:     st.plotly_chart(pie_fig)
+ 216: 
+ 217:     st.title("Time Series Visualization")
+ 218: 
+ 219:     sample_dates = pd.date_range(start="2024-01-01", end="2024-12-31", freq="D").strftime("%Y-%m-%d").tolist()
+ 220:     sample_values = np.cumsum(np.random.randn(len(sample_dates))) + 100
+ 221:     time_series_fig = create_time_series(sample_dates, sample_values, "Daily Ticket Count")
+ 222:     st.plotly_chart(time_series_fig)
+
+----------------------------------------
+
+File: utils.py
+Path: /Users/aiml/PycharmProjects/sifu/app/utils/utils.py
+Size: 5229 bytes
+Modified: 2024-07-14 19:22:10
+
+   1: """
+   2: utils.py
+   3: 
+   4: This module contains utility functions that can be used across the KB Article
+   5: and Ticket Processing System.
+   6: 
+   7: Author: Principal Python Engineer
+   8: Date: 2024-07-14
+   9: """
+  10: 
+  11: import re
+  12: from typing import Any, Dict, List
+  13: from datetime import datetime
+  14: import hashlib
+  15: import json
+  16: 
+  17: def sanitize_string(text: str) -> str:
+  18:     """
+  19:     Sanitize a string by removing special characters and extra whitespace.
+  20: 
+  21:     Args:
+  22:     text (str): The input string to sanitize.
+  23: 
+  24:     Returns:
+  25:     str: The sanitized string.
+  26:     """
+  27:     # Remove special characters
+  28:     text = re.sub(r'[^\w\s]', '', text)
+  29:     # Remove extra whitespace
+  30:     text = ' '.join(text.split())
+  31:     return text.lower()
+  32: 
+  33: def validate_date(date_string: str) -> bool:
+  34:     """
+  35:     Validate if a string is in the correct date format (YYYY-MM-DD).
+  36: 
+  37:     Args:
+  38:     date_string (str): The date string to validate.
+  39: 
+  40:     Returns:
+  41:     bool: True if the date is valid, False otherwise.
+  42:     """
+  43:     try:
+  44:         datetime.strptime(date_string, '%Y-%m-%d')
+  45:         return True
+  46:     except ValueError:
+  47:         return False
+  48: 
+  49: def generate_id(data: Dict[str, Any]) -> str:
+  50:     """
+  51:     Generate a unique ID for an item based on its content.
+  52: 
+  53:     Args:
+  54:     data (Dict[str, Any]): The data dictionary to generate an ID for.
+  55: 
+  56:     Returns:
+  57:     str: A unique ID string.
+  58:     """
+  59:     # Convert the dictionary to a JSON string
+  60:     json_string = json.dumps(data, sort_keys=True)
+  61:     # Generate a SHA256 hash of the JSON string
+  62:     return hashlib.sha256(json_string.encode()).hexdigest()
+  63: 
+  64: def flatten_dict(d: Dict[str, Any], parent_key: str = '', sep: str = '_') -> Dict[str, Any]:
+  65:     """
+  66:     Flatten a nested dictionary.
+  67: 
+  68:     Args:
+  69:     d (Dict[str, Any]): The dictionary to flatten.
+  70:     parent_key (str): The parent key for nested dictionaries.
+  71:     sep (str): The separator to use between keys.
+  72: 
+  73:     Returns:
+  74:     Dict[str, Any]: A flattened dictionary.
+  75:     """
+  76:     items = []
+  77:     for k, v in d.items():
+  78:         new_key = f"{parent_key}{sep}{k}" if parent_key else k
+  79:         if isinstance(v, dict):
+  80:             items.extend(flatten_dict(v, new_key, sep=sep).items())
+  81:         else:
+  82:             items.append((new_key, v))
+  83:     return dict(items)
+  84: 
+  85: def chunk_list(lst: List[Any], chunk_size: int) -> List[List[Any]]:
+  86:     """
+  87:     Split a list into chunks of a specified size.
+  88: 
+  89:     Args:
+  90:     lst (List[Any]): The list to split.
+  91:     chunk_size (int): The size of each chunk.
+  92: 
+  93:     Returns:
+  94:     List[List[Any]]: A list of chunks.
+  95:     """
+  96:     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+  97: 
+  98: def safe_get(dct: Dict[str, Any], *keys) -> Any:
+  99:     """
+ 100:     Safely get a value from a nested dictionary.
+ 101: 
+ 102:     Args:
+ 103:     dct (Dict[str, Any]): The dictionary to search.
+ 104:     *keys: The keys to traverse.
+ 105: 
+ 106:     Returns:
+ 107:     Any: The value if found, None otherwise.
+ 108:     """
+ 109:     for key in keys:
+ 110:         try:
+ 111:             dct = dct[key]
+ 112:         except (KeyError, TypeError):
+ 113:             return None
+ 114:     return dct
+ 115: 
+ 116: def truncate_string(s: str, max_length: int = 100, suffix: str = '...') -> str:
+ 117:     """
+ 118:     Truncate a string to a specified maximum length.
+ 119: 
+ 120:     Args:
+ 121:     s (str): The string to truncate.
+ 122:     max_length (int): The maximum length of the string.
+ 123:     suffix (str): The suffix to add to truncated strings.
+ 124: 
+ 125:     Returns:
+ 126:     str: The truncated string.
+ 127:     """
+ 128:     if len(s) <= max_length:
+ 129:         return s
+ 130:     return s[:max_length-len(suffix)] + suffix
+ 131: 
+ 132: def parse_date_range(date_range: str) -> tuple:
+ 133:     """
+ 134:     Parse a date range string into start and end dates.
+ 135: 
+ 136:     Args:
+ 137:     date_range (str): A string representing a date range (e.g., '2024-01-01 to 2024-12-31').
+ 138: 
+ 139:     Returns:
+ 140:     tuple: A tuple containing start_date and end_date as datetime objects.
+ 141:     """
+ 142:     start_str, end_str = date_range.split(' to ')
+ 143:     start_date = datetime.strptime(start_str.strip(), '%Y-%m-%d')
+ 144:     end_date = datetime.strptime(end_str.strip(), '%Y-%m-%d')
+ 145:     return start_date, end_date
+ 146: 
+ 147: # Example usage
+ 148: if __name__ == "__main__":
+ 149:     # Test sanitize_string
+ 150:     print(sanitize_string("Hello, World! 123"))  # Output: hello world 123
+ 151: 
+ 152:     # Test validate_date
+ 153:     print(validate_date("2024-07-14"))  # Output: True
+ 154:     print(validate_date("2024/07/14"))  # Output: False
+ 155: 
+ 156:     # Test generate_id
+ 157:     data = {"name": "John Doe", "age": 30}
+ 158:     print(generate_id(data))  # Output: a unique hash
+ 159: 
+ 160:     # Test flatten_dict
+ 161:     nested_dict = {"a": 1, "b": {"c": 2, "d": {"e": 3}}}
+ 162:     print(flatten_dict(nested_dict))  # Output: {'a': 1, 'b_c': 2, 'b_d_e': 3}
+ 163: 
+ 164:     # Test chunk_list
+ 165:     numbers = list(range(10))
+ 166:     print(chunk_list(numbers, 3))  # Output: [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+ 167: 
+ 168:     # Test safe_get
+ 169:     data = {"user": {"name": "John", "address": {"city": "New York"}}}
+ 170:     print(safe_get(data, "user", "address", "city"))  # Output: New York
+ 171:     print(safe_get(data, "user", "address", "country"))  # Output: None
+ 172: 
+ 173:     # Test truncate_string
+ 174:     long_string = "This is a very long string that needs to be truncated"
+ 175:     print(truncate_string(long_string, 20))  # Output: This is a very lon...
+ 176: 
+ 177:     # Test parse_date_range
+ 178:     date_range = "2024-01-01 to 2024-12-31"
+ 179:     start, end = parse_date_range(date_range)
+ 180:     print(f"Start: {start}, End: {end}")  # Output: Start and end datetime objects
+
+----------------------------------------
+
+Summary Statistics:
+Total number of files processed: 16
+Total number of lines of code: 1613
